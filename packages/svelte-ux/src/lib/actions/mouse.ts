@@ -90,7 +90,7 @@ export interface MoveDetail {
   sourceEvent: MouseEvent;
 }
 
-type MovableOptions = {
+export type MovableOptions = {
   /**
    * Number of pixels to step
    */

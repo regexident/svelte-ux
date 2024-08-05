@@ -76,7 +76,7 @@ type MovableOptions = {
 /**
  * Track mouse position changes from mouse down on node to mouse up
  */
-export const movable: Action<HTMLElement, MovableOptions | undefined> = (node, options = {}) => {
+export const movable: Action<HTMLElement | SVGElement, MovableOptions | undefined> = (node, options = {}) => {
   let lastX = 0;
   let lastY = 0;
 
@@ -167,11 +167,11 @@ export const movable: Action<HTMLElement, MovableOptions | undefined> = (node, o
     window.removeEventListener('mouseup', onMouseUp);
   }
 
-  node.addEventListener('mousedown', onMouseDown);
+  node.addEventListener('mousedown', onMouseDown as EventListener);
 
   return {
     destroy() {
-      node.removeEventListener('mousedown', onMouseDown);
+      node.removeEventListener('mousedown', onMouseDown as EventListener);
     },
   };
 };

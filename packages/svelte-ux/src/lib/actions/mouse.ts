@@ -59,6 +59,37 @@ export const longpress: Action<HTMLElement, number> = (node, duration) => {
 //   };
 // };
 
+export interface MoveDetail {
+  /**
+   * The new `x`-coordinate of the subject.
+   */
+  x: number;
+  /**
+   * The new `y`-coordinate of the subject.
+   */
+  y: number;
+  /**
+   * The change in `x`-coordinate since the previous move event.
+   */
+  dx: number;
+  /**
+   * The change in `y`-coordinate since the previous move event.
+   */
+  dy: number;
+  /**
+   * Number of currently active move gestures (on start and end, not including this one).
+  */
+  active: number;
+  /**
+   * The string “mouse”, or a numeric touch identifier.
+   */
+  identifier: string | number;
+  /**
+   * The underlying input event, such as mousemove or touchmove.
+   */
+  sourceEvent: MouseEvent;
+}
+
 type MovableOptions = {
   /**
    * Number of pixels to step
@@ -84,11 +115,16 @@ export const movable: Action<HTMLElement | SVGElement, MovableOptions | undefine
     lastX = event.clientX;
     lastY = event.clientY;
 
-    node.dispatchEvent(
-      new CustomEvent('movestart', {
-        detail: { x: lastX, y: lastY },
-      })
-    );
+    const detail: MoveDetail = {
+      x: lastX,
+      y: lastY,
+      dx: 0,
+      dy: 0,
+      active: 0,
+      identifier: "mouse",
+      sourceEvent: event,
+    };
+    node.dispatchEvent(new CustomEvent('movestart', { detail }));
 
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
@@ -143,11 +179,16 @@ export const movable: Action<HTMLElement | SVGElement, MovableOptions | undefine
     }
 
     if ((xEnabled && dx) || (yEnabled && dy)) {
-      node.dispatchEvent(
-        new CustomEvent('move', {
-          detail: { x: lastX, y: lastY, dx: xEnabled ? dx : 0, dy: yEnabled ? dy : 0 },
-        })
-      );
+      const detail: MoveDetail = {
+        x: lastX,
+        y: lastY,
+        dx: xEnabled ? dx : 0,
+        dy: yEnabled ? dy : 0,
+        active: 1,
+        identifier: "mouse",
+        sourceEvent: event,
+      };
+      node.dispatchEvent(new CustomEvent('move', { detail }));
     } else {
       // Not enough change
     }
@@ -157,11 +198,16 @@ export const movable: Action<HTMLElement | SVGElement, MovableOptions | undefine
     lastX = event.clientX;
     lastY = event.clientY;
 
-    node.dispatchEvent(
-      new CustomEvent('moveend', {
-        detail: { x: lastX, y: lastY },
-      })
-    );
+    const detail: MoveDetail = {
+      x: lastX,
+      y: lastY,
+      dx: 0,
+      dy: 0,
+      active: 0,
+      identifier: "mouse",
+      sourceEvent: event,
+    };
+    node.dispatchEvent(new CustomEvent('moveend', { detail }));
 
     window.removeEventListener('mousemove', onMouseMove);
     window.removeEventListener('mouseup', onMouseUp);
